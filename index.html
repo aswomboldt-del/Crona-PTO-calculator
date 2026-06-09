@@ -131,11 +131,11 @@
               <option value="36">0.9 FTE — 36 hrs/week</option>
               <option value="30">0.75 FTE — 30 hrs/week</option>
               <option value="24">0.6 FTE — 24 hrs/week</option>
-              <option value="custom">Custom hours/week…</option>
+              <option value="custom">Custom FTE…</option>
             </select>
           </div>
           <div id="customWrap" style="display:none;">
-            <input type="number" id="customHours" min="1" step="1" placeholder="hrs/week" inputmode="numeric" />
+            <input type="number" id="customHours" min="0" max="1.5" step="0.01" placeholder="FTE e.g. 0.85" inputmode="decimal" />
           </div>
         </div>
       </div>
@@ -197,7 +197,7 @@
   function hoursPerWeek() {
     if (fteEl.value === 'custom') {
       const v = parseFloat(customHoursEl.value);
-      return isNaN(v) ? 0 : v;
+      return isNaN(v) ? 0 : v * 40; // FTE → hours per week (1.0 FTE = 40 hrs)
     }
     return parseFloat(fteEl.value);
   }
