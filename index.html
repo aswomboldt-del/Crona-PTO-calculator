@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CRONA PTO &amp; CESLA/Kin Care Calculator</title>
+<style>
+  :root {
+    --crona-blue: #1f3a93;
+    --crona-blue-dark: #16276b;
+    --bg: #f4f6fb;
+    --card: #ffffff;
+    --text: #1c2230;
+    --muted: #66708a;
+    --line: #e2e7f0;
+    --accent: #2f6fed;
+    --good-bg: #eef4ff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    padding: 24px 16px 64px;
+  }
+  .wrap { max-width: 640px; margin: 0 auto; }
+  .brand {
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .brand .logo {
+    font-weight: 800;
+    letter-spacing: 3px;
+    font-size: 30px;
+    color: var(--crona-blue);
+  }
+  .brand .sub {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  h1 {
+    font-size: 22px;
+    text-align: center;
+    margin: 18px 0 4px;
+  }
+  .tagline { text-align: center; color: var(--muted); margin: 0 0 24px; font-size: 14px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 18px rgba(31, 58, 147, 0.06);
+  }
+  label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 15px; }
+  .hint { font-weight: 400; color: var(--muted); font-size: 13px; margin: 2px 0 10px; }
+  input[type="number"], select {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 16px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--text);
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(47,111,237,0.15); }
+  .field { margin-bottom: 20px; }
+  .fte-row { display: flex; gap: 12px; }
+  .fte-row > div { flex: 1; }
+  .results {
+    margin-top: 8px;
+    display: grid;
+    gap: 14px;
+  }
+  .result {
+    background: var(--good-bg);
+    border: 1px solid #d7e3ff;
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .result .name { font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent); font-weight: 700; margin-bottom: 4px; }
+  .result .value { font-size: 30px; font-weight: 800; color: var(--crona-blue-dark); }
+  .result .value small { font-size: 15px; font-weight: 600; color: var(--muted); }
+  .result .math { font-size: 12.5px; color: var(--muted); margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .meta {
+    margin-top: 18px;
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+  }
+  details {
+    margin-top: 22px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+  th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); }
+  th { color: var(--text); }
+  .footnote { font-size: 11px; color: var(--muted); margin-top: 26px; text-align: center; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">
+      <div class="logo">CRONA</div>
+      <div class="sub">Committee for Recognition of Nursing Achievement</div>
+    </div>
+    <h1>PTO &amp; CESLA / Kin Care Calculator</h1>
+    <p class="tagline">Estimate your annual PTO and Kin Care hours based on your years at Stanford.</p>
+
+    <div class="card">
+      <div class="field">
+        <label for="years">Select your years of service at SHC</label>
+        <div class="hint">Your current year of employment (your first year = 1).</div>
+        <input type="number" id="years" min="1" step="1" value="1" inputmode="numeric" />
+      </div>
+
+      <div class="field">
+        <label for="fte">Select your FTE / hours per week</label>
+        <div class="hint">Full-time (1.0 FTE) = 40 hrs/week. Pick yours, or enter custom hours.</div>
+        <div class="fte-row">
+          <div>
+            <select id="fte">
+              <option value="40">1.0 FTE — 40 hrs/week</option>
+              <option value="36">0.9 FTE — 36 hrs/week</option>
+              <option value="30">0.75 FTE — 30 hrs/week</option>
+              <option value="24">0.6 FTE — 24 hrs/week</option>
+              <option value="custom">Custom hours/week…</option>
+            </select>
+          </div>
+          <div id="customWrap" style="display:none;">
+            <input type="number" id="customHours" min="1" step="1" placeholder="hrs/week" inputmode="numeric" />
+          </div>
+        </div>
+      </div>
+
+      <div class="results">
+        <div class="result">
+          <div class="name">Annual hours of PTO</div>
+          <div class="value" id="ptoValue">—</div>
+          <div class="math" id="ptoMath"></div>
+        </div>
+        <div class="result">
+          <div class="name">Annual CESLA / Kin Care hours</div>
+          <div class="value" id="kinValue">—</div>
+          <div class="math" id="kinMath"></div>
+        </div>
+      </div>
+
+      <div class="meta" id="rateNote"></div>
+
+      <details>
+        <summary>How this is calculated</summary>
+        <p><strong>1. Annual PTO</strong> = accrual rate × hours per week × 52 weeks.</p>
+        <p><strong>2. CESLA / Kin Care</strong> = Annual PTO × 0.5 (50%).</p>
+        <p>Accrual rate (“Time Accrued Per Hour Worked”) by years of service:</p>
+        <table>
+          <thead><tr><th>Years of Service</th><th>Accrual rate</th></tr></thead>
+          <tbody>
+            <tr><td>First year of employment</td><td>.1000</td></tr>
+            <tr><td>2nd through 3rd year</td><td>.1193</td></tr>
+            <tr><td>4th through 9th year</td><td>.1385</td></tr>
+            <tr><td>10th and subsequent years</td><td>.1500</td></tr>
+          </tbody>
+        </table>
+      </details>
+    </div>
+
+    <p class="footnote">Unofficial estimate based on the CRONA PTO &amp; CESLA/Kin Care worksheet. Verify with your contract or HR for exact figures.</p>
+  </div>
+
+<script>
+  function accrualRate(years) {
+    if (years <= 1) return 0.1000;
+    if (years <= 3) return 0.1193;   // 2nd–3rd year
+    if (years <= 9) return 0.1385;   // 4th–9th year
+    return 0.1500;                    // 10th and beyond
+  }
+  function rateLabel(years) {
+    if (years <= 1) return "First year of employment";
+    if (years <= 3) return "2nd–3rd year";
+    if (years <= 9) return "4th–9th year";
+    return "10th year and beyond";
+  }
+
+  const yearsEl = document.getElementById('years');
+  const fteEl = document.getElementById('fte');
+  const customWrap = document.getElementById('customWrap');
+  const customHoursEl = document.getElementById('customHours');
+
+  function hoursPerWeek() {
+    if (fteEl.value === 'custom') {
+      const v = parseFloat(customHoursEl.value);
+      return isNaN(v) ? 0 : v;
+    }
+    return parseFloat(fteEl.value);
+  }
+
+  function fmt(n) {
+    return n.toLocaleString(undefined, { maximumFractionDigits: 1 });
+  }
+
+  function calc() {
+    customWrap.style.display = fteEl.value === 'custom' ? 'block' : 'none';
+
+    let years = parseInt(yearsEl.value, 10);
+    if (isNaN(years) || years < 1) years = 1;
+    const hrs = hoursPerWeek();
+    const rate = accrualRate(years);
+
+    if (!hrs || hrs <= 0) {
+      document.getElementById('ptoValue').textContent = '—';
+      document.getElementById('kinValue').textContent = '—';
+      document.getElementById('ptoMath').textContent = '';
+      document.getElementById('kinMath').textContent = '';
+      document.getElementById('rateNote').textContent = 'Enter your hours per week to see results.';
+      return;
+    }
+
+    const pto = rate * hrs * 52;
+    const kin = pto * 0.5;
+
+    document.getElementById('ptoValue').innerHTML = fmt(pto) + ' <small>hours/year</small>';
+    document.getElementById('kinValue').innerHTML = fmt(kin) + ' <small>hours/year</small>';
+    document.getElementById('ptoMath').textContent =
+      rate.toFixed(4) + ' × ' + fmt(hrs) + ' hrs/wk × 52 = ' + fmt(pto);
+    document.getElementById('kinMath').textContent =
+      fmt(pto) + ' × 0.5 = ' + fmt(kin);
+    document.getElementById('rateNote').textContent =
+      'Tier: ' + rateLabel(years) + ' — accrual rate ' + rate.toFixed(4) +
+      ' (≈ ' + fmt(pto / 8) + ' PTO days/yr at 8 hrs/day).';
+  }
+
+  [yearsEl, fteEl, customHoursEl].forEach(el => {
+    el.addEventListener('input', calc);
+    el.addEventListener('change', calc);
+  });
+  calc();
+</script>
+</body>
+</html>
